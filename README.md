@@ -1,6 +1,6 @@
 ## Work Sample for Product Aspect, Node.js Variant
 
-See [what this is here](https://github.com/EQWorks/work-samples#what-is-this).
+[What is this?](https://github.com/EQWorks/work-samples#what-is-this).
 
 ## Setup and Run
 
