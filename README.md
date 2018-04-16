@@ -1,10 +1,20 @@
 ## Work Sample for Product Aspect, Node.js Variant
 
-[What is this?](https://github.com/EQWorks/work-samples#what-is-this).
+[What is this?](https://github.com/EQWorks/work-samples#what-is-this)
 
 ## Setup and Run
 
 A few ways to get started, pick the one you're most comfortable with.
+
+All approaches would require a set of environment variables that will be given to you in the problems email:
+
+```bash
+PGHOST=
+PGPORT=
+PGDATABASE=
+PGUSER=
+PGPASSWORD=
+```
 
 ### Glitch
 
