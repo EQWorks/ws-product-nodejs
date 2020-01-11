@@ -7,7 +7,6 @@ cache:
   - node_modules
   script:
    - npm run build
-   - npm test
 deploy:
   provider: heroku
   api_key:
@@ -15,3 +14,6 @@ deploy:
   app: fierce-citadel-98781
   on:
     repo: udugam/ws-product-nodejs
+branches:
+  only:
+  - master
