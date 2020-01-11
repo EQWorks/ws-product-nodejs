@@ -1,0 +1,19 @@
+language: node_js
+node_js:
+- stable
+npm: true
+cache:
+  directories:
+  - node_modules
+  script:
+   - npm run build
+deploy:
+  provider: heroku
+  api_key:
+    secure: F2kni/wzdEBosCM/H6JAQ/IP6ilZLd9NREi6yvwxoD6iP9fPF/bHTMONfOAU1gfcypfeyk6S6zBP80GPgXV5A62qCFSdV9w2JGFnwjstNYCRvCP1/tWhbQx/tZ/WuGi7qeHJeV35g6aVrqXaqshYOk4/4dIbHXoPDfHLhM1qPGx13aUeSEGFaU/H1G7y3rLhKaneVf0CJa+XCASGupTekNfcQH86bA5FjYlo6xDcxNjv0bqKIDsZdjmp2sNEJPqFTlbiU65wdUYi843OVz/W4K0zDS5fKaRuBgRSmycXPNWqeBJgawju55ChGFrej2vBa7lH6fRVRANjtiT5qFe+jyYDtgXZ8M/22xNjX7O+D9kvjdTHFY/hqNXrb9boXUzd0AbbHv1g7/n8fT/snGdT+aWvblDS4iAi0sKuDWG3Z1EGWE/SkJRhJvBHb3lsbq07oG4G7tuf89+dJoU2Epb2lfIcK13+lZrt0Xw4myuPsY4IIOAcipDjCg2irdTCX5ETZkN8gLe2DmIhAOItj8Ammk65V/m5BEqrfoYwArakwPt2lRDzP3QbmNAXNTYdufp3DJJoRjzlKhQUTG2elwtAEF8/BMuFiiDZckiL+b+W1/bH9FPOQ3CfOAlPpZxNp/h5Ou0bAB7UPKZ3KquHUz8HO472e6zTKFbPMimw3gHARI8
+  app: fierce-citadel-98781
+  on:
+    repo: udugam/ws-product-nodejs
+branches:
+  only:
+  - master
