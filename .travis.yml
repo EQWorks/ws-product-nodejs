@@ -2,12 +2,12 @@ language: node_js
 node_js:
 - stable
 npm: true
+script: 'true'
 cache:
   directories:
   - node_modules
   script:
    - npm run build
-   - echo "skipping tests"
 deploy:
   provider: heroku
   api_key:
