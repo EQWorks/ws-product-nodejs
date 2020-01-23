@@ -1,13 +1,50 @@
 const express = require('express')
 const pg = require('pg')
 
+// SmartQueue Limiter
+const SmartQueue = require('smart-request-balancer');
+
 const app = express()
 // configs come from standard PostgreSQL env vars
 // https://www.postgresql.org/docs/9.6/static/libpq-envars.html
 const pool = new pg.Pool()
 
+// SmartQueue configurations
+const config = {
+  rules: {
+    // Settings for individual queries
+    individual: {
+      rate: 1,      // How many responses are allowed
+      limit: 1,     // Limit per second
+      priority: 1,  // Rule priority in the list. Two rules can fire simultaneously.
+    },
+    // Settings for multiple simultaneous queries
+    group: {
+      rate: 20,
+      limit: 60,
+      priority: 1,
+    },
+    // Settings for bots to broadcast
+    broadcast: {
+      rate: 30,
+      limit: 1,
+      priority: 2,
+    }
+  },
+  // Total limits set for all the rules combined to ensure max limit is not reached.
+  overall: {
+    rate: 30,
+    limit: 1,
+  },
+  retryTime: 300, // How many times it should retry.
+  ignoreOverallOverheat: true, // Should it ignore if the queue is overheated or reached its overall API limit.
+}
+
+// SmartQueue will be initiated with its custom configurations by calling on `queue`
+const queue = new SmartQueue(config);
+
 const queryHandler = (req, res, next) => {
-  pool.query(req.sqlQuery).then((r) => {
+  queue(pool).query(req.sqlQuery).then((r) => {
     return res.json(r.rows || [])
   }).catch(next)
 }

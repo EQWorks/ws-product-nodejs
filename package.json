@@ -20,7 +20,8 @@
   "homepage": "https://github.com/EQWorks/ws-product-nodejs#readme",
   "dependencies": {
     "express": "^4.15.3",
-    "pg": "^6.2.4"
+    "pg": "^6.2.4",
+    "smart-request-balancer": "^2.0.0"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"
