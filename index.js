@@ -4,7 +4,7 @@ const pg = require('pg');
 const { serverLimiter} = require('./limiters/serverLimiter');
 
 serverLimiter.limit = 10;
-serverLimiter.period = 5000;
+serverLimiter.period = 10000;
 serverLimiter.resetCountAsync();
 
 const app = express();
@@ -27,56 +27,72 @@ app.get('/', (req, res) => {
 });
 
 app.get('/events/hourly', (req, res, next) => {
-  req.sqlQuery = `
-    SELECT date, hour, events
-    FROM public.hourly_events
-    ORDER BY date, hour
-    LIMIT 168;
-  `
-  return next();
+  if (serverLimiter.evaluateCountAndHandleLimit(res)) {
+  } else {
+    req.sqlQuery = `
+      SELECT date, hour, events
+      FROM public.hourly_events
+      ORDER BY date, hour
+      LIMIT 168;
+    `
+    return next();
+  }
 }, queryHandler);
 
 app.get('/events/daily', (req, res, next) => {
-  req.sqlQuery = `
-    SELECT date, SUM(events) AS events
-    FROM public.hourly_events
-    GROUP BY date
-    ORDER BY date
-    LIMIT 7;
-  `
-  return next();
+
+  if (serverLimiter.evaluateCountAndHandleLimit(res)) {
+  } else {
+    req.sqlQuery = `
+      SELECT date, SUM(events) AS events
+      FROM public.hourly_events
+      GROUP BY date
+      ORDER BY date
+      LIMIT 7;
+    `
+    return next();
+  }
 }, queryHandler);
 
 app.get('/stats/hourly', (req, res, next) => {
-  req.sqlQuery = `
-    SELECT date, hour, impressions, clicks, revenue
-    FROM public.hourly_stats
-    ORDER BY date, hour
-    LIMIT 168;
-  `
-  return next();
+  if (serverLimiter.evaluateCountAndHandleLimit(res)) {
+  } else {
+    req.sqlQuery = `
+      SELECT date, hour, impressions, clicks, revenue
+      FROM public.hourly_stats
+      ORDER BY date, hour
+      LIMIT 168;
+    `
+    return next();
+  }
 }, queryHandler);
 
 app.get('/stats/daily', (req, res, next) => {
-  req.sqlQuery = `
-    SELECT date,
-        SUM(impressions) AS impressions,
-        SUM(clicks) AS clicks,
-        SUM(revenue) AS revenue
-    FROM public.hourly_stats
-    GROUP BY date
-    ORDER BY date
-    LIMIT 7;
-  `
-  return next();
+  if (serverLimiter.evaluateCountAndHandleLimit(res)) {
+  } else {
+    req.sqlQuery = `
+      SELECT date,
+          SUM(impressions) AS impressions,
+          SUM(clicks) AS clicks,
+          SUM(revenue) AS revenue
+      FROM public.hourly_stats
+      GROUP BY date
+      ORDER BY date
+      LIMIT 7;
+    `
+    return next();
+  }
 }, queryHandler);
 
 app.get('/poi', (req, res, next) => {
-  req.sqlQuery = `
-    SELECT *
-    FROM public.poi;
-  `
-  return next();
+  if (serverLimiter.evaluateCountAndHandleLimit(res)) {
+  } else {
+    req.sqlQuery = `
+      SELECT *
+      FROM public.poi;
+    `
+    return next();
+  }
 }, queryHandler);
 
 app.listen(process.env.PORT || 5555, (err) => {
