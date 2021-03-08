@@ -1,5 +1,5 @@
 # https://hub.docker.com/_/node/
-FROM node:latest
+FROM node:14
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
