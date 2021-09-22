@@ -1,6 +1,10 @@
 const express = require('express')
 const pg = require('pg')
 
+require('dotenv').config()
+
+const rateLimiter = require('./Middleware/rateLimiter')
+
 const app = express()
 // configs come from standard PostgreSQL env vars
 // https://www.postgresql.org/docs/9.6/static/libpq-envars.html
@@ -12,11 +16,11 @@ const queryHandler = (req, res, next) => {
   }).catch(next)
 }
 
-app.get('/', (req, res) => {
+app.get('/' , rateLimiter ,(req, res) => {
   res.send('Welcome to EQ Works 😎')
 })
 
-app.get('/events/hourly', (req, res, next) => {
+app.get('/events/hourly', rateLimiter , (req, res, next) => {
   req.sqlQuery = `
     SELECT date, hour, events
     FROM public.hourly_events
@@ -26,7 +30,7 @@ app.get('/events/hourly', (req, res, next) => {
   return next()
 }, queryHandler)
 
-app.get('/events/daily', (req, res, next) => {
+app.get('/events/daily', rateLimiter , (req, res, next) => {
   req.sqlQuery = `
     SELECT date, SUM(events) AS events
     FROM public.hourly_events
@@ -37,7 +41,7 @@ app.get('/events/daily', (req, res, next) => {
   return next()
 }, queryHandler)
 
-app.get('/stats/hourly', (req, res, next) => {
+app.get('/stats/hourly', rateLimiter , (req, res, next) => {
   req.sqlQuery = `
     SELECT date, hour, impressions, clicks, revenue
     FROM public.hourly_stats
@@ -47,7 +51,7 @@ app.get('/stats/hourly', (req, res, next) => {
   return next()
 }, queryHandler)
 
-app.get('/stats/daily', (req, res, next) => {
+app.get('/stats/daily', rateLimiter , (req, res, next) => {
   req.sqlQuery = `
     SELECT date,
         SUM(impressions) AS impressions,
@@ -61,7 +65,7 @@ app.get('/stats/daily', (req, res, next) => {
   return next()
 }, queryHandler)
 
-app.get('/poi', (req, res, next) => {
+app.get('/poi', rateLimiter , (req, res, next) => {
   req.sqlQuery = `
     SELECT *
     FROM public.poi;
