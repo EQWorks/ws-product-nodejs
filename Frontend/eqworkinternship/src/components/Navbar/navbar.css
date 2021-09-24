@@ -1,0 +1,14 @@
+
+#navbar-nav{
+    margin-right: 3rem;
+}
+
+.nav-item{
+    margin-left: 2rem;
+}
+
+.nav-link{
+    font-weight: bolder;
+    color: aliceblue;
+    font-size: x-large;
+}

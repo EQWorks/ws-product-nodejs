@@ -4,7 +4,7 @@ const moment = require('moment')
 // Going to use Sliding Window Counter Algorithm 
 
 const maxWindowSize = 6;  //In Minutes
-const maxRequest = 10;   // Max Request allowed in 5 minutes
+const maxRequest = 100;   // Max Request allowed in 5 minutes
 const windowLogInterval = 2;  // Logging Interval is 2 minutes
 
 //Create a redis Client
@@ -29,7 +29,6 @@ const rateLimiter = (req , res , next) => {
 
             // Do Not forget to Remove the console.log
             // console.log('CHECKING FOR RECORDS:' , record);
-
             //No Record found or it is the first API Call for the current User
             if(record == null){
 
@@ -42,14 +41,14 @@ const rateLimiter = (req , res , next) => {
 
                 collection.push(requestLog);
                 // console.log('CHECKING FOR COLLECTION :' , collection);
-                client.set(req.ip , JSON.stringify(collection));
+                client.set(req.ip,JSON.stringify(collection));
 
                 next();
             }
             
             //if a record is found
             let data = JSON.parse(record);
-
+            
             let windowStartTime = moment()
             .subtract(maxWindowSize , 'minutes')
             .unix();
@@ -67,7 +66,7 @@ const rateLimiter = (req , res , next) => {
                 return accumulator + total.count ;
             }, 0);
 
-            console.log(requestCount);
+            
             // Checking if it's over the max limit of request
             if (requestCount >= maxRequest){
 
@@ -93,8 +92,8 @@ const rateLimiter = (req , res , next) => {
                     });
                 } 
 
-                client.set(req.ip , JSON.stringify(data))
-                
+                client.set(req.ip,JSON.stringify(data))
+            
                 next();
             }
         });    

@@ -6,6 +6,20 @@ require('dotenv').config()
 const rateLimiter = require('./Middleware/rateLimiter')
 
 const app = express()
+
+app.enable('trust proxy')
+app.set('trust proxy' , true)
+
+app.use(function (req, res, next) {
+
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+  res.setHeader('Access-Control-Allow-Credentials', true);
+
+  next();
+});
+
 // configs come from standard PostgreSQL env vars
 // https://www.postgresql.org/docs/9.6/static/libpq-envars.html
 const pool = new pg.Pool()
