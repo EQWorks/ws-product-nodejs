@@ -23,6 +23,10 @@ export default function Chart() {
     
 
     useEffect(() => {
+        if(!window.location.hash){
+            window.location = window.location + '#loaded'; // Reloading the Page Because Highcharts.charts doesn't save data until caches
+            window.location.reload();
+        }
 
         async function statCallDaily () {
             let {data} = await api.dailyStatApi();
@@ -55,7 +59,7 @@ export default function Chart() {
     drilldown(Highcharts)
     
     useEffect(() => {
-
+        
         setDailyOptions({
             chart: {
                 type: 'column',
@@ -86,8 +90,10 @@ export default function Chart() {
                             }
                         }
 
+            
                         Highcharts.charts[0].addSeriesAsDrilldown(e.point , series)
                         Highcharts.charts[0].yAxis[0].setTitle({text : 'Total No of given Stats'});
+                        
                     },
                     drillup: function(e){
                         Highcharts.charts[0].yAxis[0].setTitle({text : 'Total No of Stats'});
@@ -123,7 +129,7 @@ export default function Chart() {
                 
             }],
         })
-    },[dailyStat])
+    },[dailyStat , setDailyOptions])
 
     useEffect(() => {
 

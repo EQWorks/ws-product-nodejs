@@ -53,48 +53,49 @@ const rateLimiter = (req , res , next) => {
             .subtract(maxWindowSize , 'minutes')
             .unix();
 
-            
+            if(data !== null){
             // Get all the objects within the current Window Interval
-            let requestInWindow =  data.filter(logs => {
-                return logs.timestamp > windowStartTime;
-            });
+                let requestInWindow =  data.filter(logs => {
+                    return logs.timestamp > windowStartTime;
+                });
 
-            // Do not forget to remove the console.log
-            console.log ('CHECKING REQUEST IN WINDOW:' , requestInWindow)
-            // Get the total number of request made in this Interval
-            let requestCount = requestInWindow.reduce((accumulator , total ) => {
-                return accumulator + total.count ;
-            }, 0);
+                // Do not forget to remove the console.log
+                console.log ('CHECKING REQUEST IN WINDOW:' , requestInWindow)
+                // Get the total number of request made in this Interval
+                let requestCount = requestInWindow.reduce((accumulator , total ) => {
+                    return accumulator + total.count ;
+                }, 0);
 
-            
-            // Checking if it's over the max limit of request
-            if (requestCount >= maxRequest){
+                
+                // Checking if it's over the max limit of request
+                if (requestCount >= maxRequest){
 
-                res.status(429).json(`You have exceeded ${maxRequest} request within ${maxWindowSize} minutes`)    
-            
-            }else{
-
-                // Checking which log to make the entry in
-                let lastLog = data[data.length - 1];
-                let potentialStartTime = currentRequestTime
-                .subtract(windowLogInterval , 'minutes')
-                .unix();
-
-                //If it is in current Log
-                if(lastLog.timestamp > potentialStartTime){
-                    lastLog.count++;
-                    data[data.length -1] = lastLog;
+                    res.status(429).json(`You have exceeded ${maxRequest} request within ${maxWindowSize} minutes`)    
+                
                 }else{
-                    // If not in the current log 
-                    data.push({
-                        timestamp: currentRequestTime.unix(),
-                        count: 1
-                    });
-                } 
 
-                client.set(req.ip,JSON.stringify(data))
-            
-                next();
+                    // Checking which log to make the entry in
+                    let lastLog = data[data.length - 1];
+                    let potentialStartTime = currentRequestTime
+                    .subtract(windowLogInterval , 'minutes')
+                    .unix();
+
+                    //If it is in current Log
+                    if(lastLog.timestamp > potentialStartTime){
+                        lastLog.count++;
+                        data[data.length -1] = lastLog;
+                    }else{
+                        // If not in the current log 
+                        data.push({
+                            timestamp: currentRequestTime.unix(),
+                            count: 1
+                        });
+                    } 
+
+                    client.set(req.ip,JSON.stringify(data))
+                
+                    next();
+                }
             }
         });    
     }catch (error) {

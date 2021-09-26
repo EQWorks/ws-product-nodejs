@@ -44,6 +44,18 @@ app.get('/events/hourly', rateLimiter , (req, res, next) => {
   return next()
 }, queryHandler)
 
+// Only For Data Table
+app.get ('/events/hourly/interest' , rateLimiter , (req , res , next) => {
+  req.sqlQuery = `
+    SELECT *
+    FROM public.hourly_events
+    ORDER BY date, hour
+    LIMIT 168;
+    `
+    return next()
+
+}, queryHandler)
+
 app.get('/events/daily', rateLimiter , (req, res, next) => {
   req.sqlQuery = `
     SELECT date, SUM(events) AS events
@@ -63,6 +75,17 @@ app.get('/stats/hourly', rateLimiter , (req, res, next) => {
     LIMIT 168;
   `
   return next()
+}, queryHandler)
+
+//Only for Data Table 
+app.get('/stats/hourly/interest', rateLimiter , (req, res, next) => {
+  req.sqlQuery = `
+    SELECT *
+    FROM public.hourly_stats
+    ORDER BY date, hour
+    LIMIT 168;
+    `
+    return next()
 }, queryHandler)
 
 app.get('/stats/daily', rateLimiter , (req, res, next) => {
