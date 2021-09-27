@@ -3,7 +3,8 @@ import { Typography , Grid } from '@material-ui/core';
 import {DataGrid , GridToolbarContainer , GridToolbarFilterButton } from '@mui/x-data-grid';
 import * as api from '../../api/api';
 import './data.css';
-import moment from 'moment'
+import moment from 'moment';
+import {Redirect} from 'react-router-dom';
 
 export default function DataTable() {
     
@@ -13,6 +14,9 @@ export default function DataTable() {
     const [eventPageSize , setEventPageSize] = useState(5);
     const [statHeight , setStatHeight] = useState('450px')
     const [eventHeight , setEventHeight] = useState('450px')
+
+    const [error , setError] = useState(false);
+    const [errorMessage , setErrorMessage] = useState('');
 
     const statColumn = [
         {
@@ -74,56 +78,74 @@ export default function DataTable() {
 
         async function statHourlyCall(){
 
-            let [message1,message2] = await Promise.all([(await api.hourlyStatDataTableApi()).data , (await api.poiAPI()).data]);
+            try{
 
-            for(let i = 0 ; i < message1.length ; i++){
+                let [message1,message2] = await Promise.all([(await api.hourlyStatDataTableApi()).data , (await api.poiAPI()).data]);
 
-                message1[i].id = i;
+                for(let i = 0 ; i < message1.length ; i++){
 
-                for(let j =0 ; j < message2.length ; j++){
-                    
-                    if(message1[i].poi_id === message2[j].poi_id){
+                    message1[i].id = i;
 
-                        message1[i].date = moment(message1[i].date).utc().format('MM/DD/YYYY');
-                        message1[i].poi_name = message2[j].name;        
-                        break;
-
-                    }else{
-
-                        continue;
+                    for(let j =0 ; j < message2.length ; j++){
                         
+                        if(message1[i].poi_id === message2[j].poi_id){
+
+                            message1[i].date = moment(message1[i].date).utc().format('MM/DD/YYYY');
+                            message1[i].poi_name = message2[j].name;        
+                            break;
+
+                        }else{
+
+                            continue;
+                            
+                        }
                     }
                 }
+                
+                setRowStat(message1);
+            }catch(error){
+
+                setErrorMessage(`${error.response.data}`);
+                setError(true);
+
             }
-            console.log(message1);
-            setRowStat(message1);
         }
 
         async function eventHourlyCall(){
 
-            let [message1,message2] = await Promise.all([(await api.hourlyEventDataTableApi()).data , (await api.poiAPI()).data]);
+            try{
 
-            for(let i = 0 ; i < message1.length ; i++){
-                
-                message1[i].id = i;
+                let [message1,message2] = await Promise.all([(await api.hourlyEventDataTableApi()).data , (await api.poiAPI()).data]);
 
-                for(let j =0 ; j < message2.length ; j++){
+                for(let i = 0 ; i < message1.length ; i++){
                     
-                    if(message1[i].poi_id === message2[j].poi_id){
+                    message1[i].id = i;
 
-                        message1[i].date = moment(message1[i].date).utc().format('MM/DD/YYYY');
-                        message1[i].poi_name = message2[j].name;        
-                        break;
-                    }else{
+                    for(let j =0 ; j < message2.length ; j++){
+                        
+                        if(message1[i].poi_id === message2[j].poi_id){
 
-                        continue;
+                            message1[i].date = moment(message1[i].date).utc().format('MM/DD/YYYY');
+                            message1[i].poi_name = message2[j].name;        
+                            break;
 
+                        }else{
+
+                            continue;
+
+                        }
                     }
                 }
+            
+                setRowEvent(message1);
+            }catch(error){
+
+                setErrorMessage(`${error.response.data}`);
+                setError(true);
+
             }
-            console.log('CHECKING NEW DATA :' , message1)
-            setRowEvent(message1);
         }
+        
 
         statHourlyCall();
         eventHourlyCall();
@@ -195,6 +217,14 @@ export default function DataTable() {
                     />
                 </Grid>
             </Grid>
+            {error && (
+                 <Redirect to ={{
+                    pathname:'/toomanyrequests',
+                    state:{data : errorMessage }
+                }} />
+            )
+                
+            }
         </div>
     )
 }

@@ -6,7 +6,8 @@ import drilldown from 'highcharts/modules/drilldown';
 import { Typography , Grid } from '@material-ui/core';
 import moment from 'moment';
 import './chart.css';
-import _ from 'lodash'
+import _ from 'lodash';
+import {Redirect} from 'react-router-dom';
 
 
 export default function Chart() {
@@ -20,7 +21,8 @@ export default function Chart() {
     const [dailyEventOptions , setDailyEventOptions] = useState({});
     const [hourlyEventOptions , setHourlyEventOptions] = useState({});
     
-    
+    const [error , setError] = useState(false);
+    const [errorMessage , setErrorMessage] = useState('');
 
     useEffect(() => {
         if(!window.location.hash){
@@ -29,24 +31,61 @@ export default function Chart() {
         }
 
         async function statCallDaily () {
-            let {data} = await api.dailyStatApi();
-            setDailyStat(data);
+            
+            try{
+
+                let {data} = await api.dailyStatApi();
+                setDailyStat(data);
+
+            }catch(error){
+
+                setErrorMessage(`${error.response.data}`);
+                setError(true);
+
+            }
         }
 
         async function statCallHourly () {
-            let {data} = await api.hourlyStatApi();
-            setHourlyStat(data);    
+
+            try{
+
+                let {data} = await api.hourlyStatApi();
+                setHourlyStat(data);
+
+            }catch(error){
+             
+                setErrorMessage(`${error.response.data}`);
+                setError(true);
+
+            }    
         }
 
         async function eventCallDaily () {
-            let {data} = await api.dailyEventApi();
-            setDailyEvent(data);
+            try{
+                let {data} = await api.dailyEventApi();
+                setDailyEvent(data);
             
+            }catch(error){
+
+                setErrorMessage(`${error.response.data}`);
+                setError(true);
+
+            }
         }
 
         async function eventCallHourly () {
-            let {data} = await api.hourlyEventApi();
-            setHourlyEvent(data);   
+            try{
+
+                let {data} = await api.hourlyEventApi();
+                setHourlyEvent(data);
+
+            }catch(error){
+
+                setErrorMessage(`${error.response.data}`);
+                setError(true);
+
+            }
+                
         }
 
         statCallDaily();
@@ -476,6 +515,14 @@ export default function Chart() {
                     <HighchartsReact highcharts={Highcharts} options={hourlyEventOptions}/>
                 </Grid>
             </Grid>
+            {error && (
+                 <Redirect to ={{
+                    pathname:'/toomanyrequests',
+                    state:{data : errorMessage }
+                }} />
+            )
+                
+            }
         </div>
     )
 }

@@ -2,12 +2,16 @@ import React, { useEffect, useState } from 'react';
 import {Map , GoogleApiWrapper , InfoWindow , Marker , MarkerCluster} from 'google-maps-react';
 import {Typography} from '@material-ui/core';
 import * as api from '../../api/api';
+import {Redirect} from 'react-router-dom';
 
 export function Maps({google , locations =[] , marker}) {
 
     const [newLocation , setNewLocation] = useState(locations)
     const [zoom , setZoom] = useState(4);
     const [center , setCenter] = useState(newLocation[0])
+
+    const [error , setError] = useState(false);
+    const [errorMessage , setErrorMessage] = useState('');
 
     const handleMarker = (coords) => {
 
@@ -32,15 +36,23 @@ export function Maps({google , locations =[] , marker}) {
 
         async function poiCall(){
             
-            let {data} = await api.poiAPI();
+            try{
+                let {data} = await api.poiAPI();
             
-            for (let i = 0 ; i < data.length ; i ++){
-                let lng = 'lng';
-                data[i] = {...data[i] , [lng] : data[i].lon}
-                delete data[i].lon
+                for (let i = 0 ; i < data.length ; i ++){
+                    let lng = 'lng';
+                    data[i] = {...data[i] , [lng] : data[i].lon}
+                    delete data[i].lon
+                }
+            
+                setNewLocation(data);
+
+            }catch(error){
+
+                setErrorMessage(`${error.response.data}`);
+                setError(true);
+
             }
-            
-            setNewLocation(data);
         }
 
         poiCall();
@@ -62,11 +74,18 @@ export function Maps({google , locations =[] , marker}) {
                     onClick= {() => {handleMarker(coords)}}/>
                 )}
             </Map>
-          
+            {error && (
+                 <Redirect to ={{
+                    pathname:'/toomanyrequests',
+                    state:{data : errorMessage }
+                }} />
+            )
+                
+            }
         </div>
     )
 }
 
 export default GoogleApiWrapper({
-    apiKey: 'AIzaSyCNAZw3OZqID039-pPOFjTP-ToHsdIb_pk'
+    apiKey: `${process.env.REACT_APP_GOOGLE_API_KEY}`
 })(Maps);
