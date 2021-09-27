@@ -4,6 +4,7 @@ import {BrowserRouter as Router , Switch , Route} from 'react-router-dom'
 import Home from './components/Home/Home';
 import Chart from './components/Chart/Chart';
 import DataTable from './components/DataTable/DataTable';
+import Maps from './components/Maps/Maps';
 
 function App() {
   const NavRoute = ({path , component:Component , exact}) => {
@@ -21,6 +22,7 @@ function App() {
           <NavRoute exact path='/' component={Home}/>
           <NavRoute path='/charts' component={Chart} />
           <NavRoute path='/datatable' component={DataTable} />
+          <NavRoute path='/map' component={Maps} />
         </Switch>
       </div>
     </Router>

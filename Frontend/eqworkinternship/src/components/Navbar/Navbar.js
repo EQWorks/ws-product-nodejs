@@ -22,6 +22,11 @@ export default function Navbar() {
                             Data Table
                         </Link>
                     </li>
+                    <li className="nav-item">
+                        <Link to='/map' className='nav-link'>
+                            Map
+                        </Link>
+                    </li>
                 </ul>
             </nav>    
         </div>
