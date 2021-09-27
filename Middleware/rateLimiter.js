@@ -59,8 +59,6 @@ const rateLimiter = (req , res , next) => {
                     return logs.timestamp > windowStartTime;
                 });
 
-                // Do not forget to remove the console.log
-                console.log ('CHECKING REQUEST IN WINDOW:' , requestInWindow)
                 // Get the total number of request made in this Interval
                 let requestCount = requestInWindow.reduce((accumulator , total ) => {
                     return accumulator + total.count ;
