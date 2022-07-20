@@ -47,7 +47,7 @@ app.get(
     FROM public.hourly_events
     GROUP BY date
     ORDER BY date
-    LIMIT 7;
+    LIMIT 70;
   `;
     return next();
   },
@@ -79,7 +79,7 @@ app.get(
     FROM public.hourly_stats
     GROUP BY date
     ORDER BY date
-    LIMIT 7;
+    LIMIT 66;
   `;
     return next();
   },
