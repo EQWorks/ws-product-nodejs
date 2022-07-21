@@ -5,6 +5,46 @@ const pg = require('pg');
 const app = express();
 // configs come from standard PostgreSQL env vars
 // https://www.postgresql.org/docs/9.6/static/libpq-envars.html
+
+class TokenBucket {
+  constructor(capacity, fillPerSecond) {
+    this.capacity = capacity;
+    this.tokens = capacity;
+    setInterval(() => this.addToken(), 1000 / fillPerSecond);
+  }
+
+  addToken() {
+    if (this.tokens < this.capacity) {
+      this.tokens += 1;
+    }
+  }
+
+  take() {
+    if (this.tokens > 0) {
+      this.tokens -= 1;
+      return true;
+    }
+
+    return false;
+  }
+}
+function limitRequests(perSecond, maxBurst) {
+  const buckets = new Map();
+
+  // Return an Express middleware function
+  return function limitRequestsMiddleware(req, res, next) {
+    if (!buckets.has(req.ip)) {
+      buckets.set(req.ip, new TokenBucket(maxBurst, perSecond));
+    }
+
+    const bucketForIP = buckets.get(req.ip);
+    if (bucketForIP.take()) {
+      next();
+    } else {
+      res.status(429).send('Client rate limit exceeded');
+    }
+  };
+}
 const pool = new pg.Pool();
 
 const queryHandler = (req, res, next) => {
@@ -21,7 +61,7 @@ const queryHandler = (req, res, next) => {
     .catch(next);
 };
 
-app.get('/', (req, res) => {
+app.get('/', limitRequests(2, 3), (req, res) => {
   res.send('Welcome to EQ Works 😎');
 });
 
